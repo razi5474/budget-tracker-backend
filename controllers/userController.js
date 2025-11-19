@@ -31,7 +31,14 @@ const register = async (req,res)=>{
     const saveduser = await newUser.save();
     if(saveduser){
       const token = createToken(saveduser._id)
-      res.cookie("token",token)
+      const isProduction = process.env.NODE_ENV === "production";
+
+      res.cookie("token",token,{
+        httpOnly: true,
+        secure: isProduction,         
+        sameSite: isProduction ? "none" : "lax",  
+        maxAge: 1000 * 60 * 60 * 24,
+      })
       
       return res.status(201).json({message: "User registered successfully"})
     }
@@ -62,7 +69,15 @@ const login = async(req,res)=>{
       return res.status(400).json({error:"password is incorrect"})
     }
       const token = createToken(userExists._id)
-      res.cookie("token",token)
+
+      const isProduction = process.env.NODE_ENV === "production";
+
+      res.cookie("token",token,{
+        httpOnly: true,
+        secure: isProduction,         
+        sameSite: isProduction ? "none" : "lax",  
+        maxAge: 1000 * 60 * 60 * 24,
+      })
      
     return res.status(200).json({message: "User Login successful",userExists})
 
