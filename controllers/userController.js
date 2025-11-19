@@ -5,6 +5,7 @@ const {hashPassword,comparePassword} = require("../utils/passwordUtilities");
 
 const register = async (req,res)=>{
   try {
+    console.log("registerd")
     const {name,email,password,confirmPassword} = req.body;
 
     if(!name || !email || !password || !confirmPassword){
@@ -14,9 +15,9 @@ const register = async (req,res)=>{
     if(password !== confirmPassword){
       return res.status(400).json({error: "Password and Confirm Password do not match"})
     }
-
+    console.log("usercheck")
     const userExists = await userModel.findOne({email})// email:req.body.email
-
+    console.log("userexsist")
     if(userExists){
       return res.status(400).json({error: "User already exists"})
     }
