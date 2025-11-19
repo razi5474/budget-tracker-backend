@@ -1,0 +1,78 @@
+const userModel = require("../models/userModel");
+const { createToken } = require("../utils/generateToken");
+const {hashPassword,comparePassword} = require("../utils/passwordUtilities");
+
+
+const register = async (req,res)=>{
+  try {
+    const {name,email,password,confirmPassword} = req.body;
+
+    if(!name || !email || !password || !confirmPassword){
+      return res.status(400).json({error: "All fields are required"})
+    }
+    
+    if(password !== confirmPassword){
+      return res.status(400).json({error: "Password and Confirm Password do not match"})
+    }
+
+    const userExists = await userModel.findOne({email})// email:req.body.email
+
+    if(userExists){
+      return res.status(400).json({error: "User already exists"})
+    }
+
+    const hashedPassword = await hashPassword(password)
+
+    const newUser = new userModel({
+      name,email,password:hashedPassword
+    })
+
+    const saveduser = await newUser.save();
+    if(saveduser){
+      const token = createToken(saveduser._id)
+      res.cookie("token",token)
+      
+      return res.status(201).json({message: "User registered successfully"})
+    }
+    
+  } catch (error) {
+    console.log(error);
+    res.status(error.status || 500).json({message: error.message || "Internal Server Error"})
+  }
+}
+
+const login = async(req,res)=>{
+  try {
+    const {email,password} = req.body;
+
+    if(!email || !password){
+      return res.status(400).json({error: "All fields are required"})
+    }
+
+    const userExists = await userModel.findOne({email})
+    if(!userExists){
+      return res.status(400).json({error: "user does not exist"})
+    }
+
+    const passwordMatch = await comparePassword(password,userExists.password)
+    console.log(passwordMatch);
+
+    if(!passwordMatch){
+      return res.status(400).json({error:"password is incorrect"})
+    }
+      const token = createToken(userExists._id)
+      res.cookie("token",token)
+     
+    return res.status(200).json({message: "User Login successful",userExists})
+
+  } catch (error) {
+    console.log(error);
+    res.status(error.status || 500).json({message: error.message || "Internal Server Error"})
+  }
+}
+
+
+module.exports = {
+  register,
+  login
+}
