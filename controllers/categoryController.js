@@ -1,4 +1,6 @@
 const Category = require('../models/categoryModel')
+const Budget = require('../models/budgetModel')
+const Expense = require('../models/expenseModel')
 
 const createCategory = async (req,res)=>{
   try {
@@ -52,7 +54,7 @@ const updateCategory = async (req,res)=>{
 }
 
 
-const deleteCtegiry = async (req,res)=>{
+const deleteCategory = async (req,res)=>{
   try {
      const deleted = await Category.findOneAndDelete({
       _id: req.params.id,
@@ -62,11 +64,15 @@ const deleteCtegiry = async (req,res)=>{
     if (!deleted)
       return res.status(404).json({ error: "Category not found" });
 
-    res.json({ message: "Category deleted" });
+    // Cascade delete associated budgets and expenses
+    await Budget.deleteMany({ categoryID: req.params.id, userID: req.user.id });
+    await Expense.deleteMany({ categoryID: req.params.id, userID: req.user.id });
+
+    res.json({ message: "Category and associated data deleted" });
   } catch (error) {
     console.log(error);
     res.status(error.status || 500).json({message: error.message || "Internal Server Error"});
   }
 }
 
-module.exports = {createCategory,getCategories,updateCategory,deleteCtegiry}
+module.exports = {createCategory,getCategories,updateCategory,deleteCategory}

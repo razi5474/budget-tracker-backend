@@ -40,7 +40,7 @@ const register = async (req,res)=>{
         maxAge: 1000 * 60 * 60 * 24,
       })
       
-      return res.status(201).json({message: "User registered successfully"})
+      return res.status(201).json({message: "User registered successfully", user: saveduser})
     }
     
   } catch (error) {

@@ -9,7 +9,7 @@ const addExpense = async (req,res)=>{
     if(!categoryID || !amount || !date){
       return res.status(400).json({error: "All fields are required"})
     }
-
+    console.log(date)
      const expenseDate = new Date(date);
     const monthKey = `${expenseDate.getFullYear()}-${(expenseDate.getMonth() + 1)
       .toString()

@@ -1,4 +1,4 @@
-const { createCategory, getCategories, updateCategory, deleteCtegiry } = require('../../controllers/categoryController');
+const { createCategory, getCategories, updateCategory, deleteCategory } = require('../../controllers/categoryController');
 const auth = require('../../middlewares/auth');
 
 const categoryRouter = require('express').Router();
@@ -9,7 +9,7 @@ categoryRouter.get('/',auth,getCategories);
 
 categoryRouter.put('/update/:id',auth,updateCategory);
 
-categoryRouter.delete('/delete/:id',auth,deleteCtegiry)
+categoryRouter.delete('/delete/:id',auth,deleteCategory)
 
 
 
